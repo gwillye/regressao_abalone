@@ -1,52 +1,55 @@
-# 🐚 Abalone Age Prediction — Linear Regression
+# Abalone Age Prediction (Linear Regression)
 
-> *Academic context — UFMS, Data Science / Machine Learning.*
+Academic project from UFMS (Data Science / Machine Learning). The idea is to predict an abalone's age from physical measurements using multiple linear regression, instead of the slow manual method of counting shell rings under a microscope. The repo includes the exploratory analysis, the visualizations and the model evaluation, all built with scikit-learn.
 
-A **machine-learning** project (multiple linear regression) that predicts an abalone's age from physical measurements — replacing the slow manual method of counting shell rings under a microscope. Includes exploratory analysis, visualizations and model evaluation with `scikit-learn`.
+## Goal
 
-## 🎯 Goal
-Estimate abalone age (`Age = Rings + 1.5`) from 8 easy-to-take physical measurements instead of counting rings, and assess whether a linear model is viable for automating the prediction.
+Estimate abalone age (`Age = Rings + 1.5`) from 8 measurements that are easy to take, rather than counting rings by hand. The secondary question is whether a plain linear model is good enough to automate the prediction in the first place.
 
-## 📊 Dataset
-[Abalone Data Set — UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/1/abalone) (included: `abalone.data`, schema in `abalone.names`).
-- **4,177 instances**, no missing values.
-- **Features:** `Sex` (M/F/I — categorical), `Length`, `Diameter`, `Height`, `Whole weight`, `Shucked weight`, `Viscera weight`, `Shell weight`.
-- **Target:** `Age` (years), derived from `Rings + 1.5`.
+## Dataset
 
-## 🧪 Methodology
-1. **Initial exploration** (`initial_exploration.py`): load, column renaming, descriptive stats, type/missing checks.
-2. **Visualization** (`data_visualization.py`): histograms, age-by-sex box plot, correlation heatmap.
-3. **Modeling** (`train_and_evaluate_model.py`): scikit-learn `Pipeline` with `OneHotEncoder` for `Sex` + `LinearRegression`; 80/20 train/test split (`random_state=42`).
+The data comes from the [Abalone Data Set on the UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/1/abalone). The files are included here (`abalone.data`, with the schema described in `abalone.names`).
 
-## 📈 Results
-| Metric | Value |
-|---|---|
-| **R²** (coefficient of determination) | **0.5482** |
-| **RMSE** (mean error) | **2.21 years** |
+- 4,177 instances, no missing values.
+- Features: `Sex` (M/F/I, categorical), `Length`, `Diameter`, `Height`, `Whole weight`, `Shucked weight`, `Viscera weight`, `Shell weight`.
+- Target: `Age` in years, derived from `Rings + 1.5`.
 
-The model explains ~55% of age variance; the ~2.2-year mean error is reasonable given the 2.5–30.5-year range. The most influential variables are `Shell weight` (r=0.63) and `Diameter` (r=0.57).
+## How it works
 
-## 🏆 Model comparison (`train_compare_models.py`)
-Beyond the linear baseline, several regressors were compared with **5-fold cross-validation** (full dataset). Run it with `python train_compare_models.py` → writes [`model_comparison_report.md`](model_comparison_report.md).
+The pipeline is split across a few scripts:
+
+1. Initial exploration (`initial_exploration.py`): loads the data, renames columns, computes descriptive stats and checks types and missing values.
+2. Visualization (`data_visualization.py`): produces histograms, an age-by-sex box plot and a correlation heatmap.
+3. Modeling (`train_and_evaluate_model.py`): a scikit-learn `Pipeline` that one-hot encodes `Sex` and fits a `LinearRegression`, using an 80/20 train/test split with `random_state=42`.
+
+## Results
+
+The linear model lands at an R squared of 0.5482 and an RMSE of 2.21 years. In other words it explains roughly 55% of the variance in age, and the average error of about 2.2 years is reasonable given that ages span from 2.5 to 30.5 years. The most influential variables are `Shell weight` (r=0.63) and `Diameter` (r=0.57).
+
+## Comparing several models
+
+Beyond the linear baseline, `train_compare_models.py` compares a handful of regressors using 5-fold cross-validation on the full dataset. Running `python train_compare_models.py` writes the details to [`model_comparison_report.md`](model_comparison_report.md).
 
 | Rank | Model | R² (CV) | RMSE | MAE |
 |---|---|---|---|---|
-| 1 | **SVR (RBF)** ⭐ | **0.522** | 2.08 | 1.49 |
+| 1 | SVR (RBF) | 0.522 | 2.08 | 1.49 |
 | 2 | Gradient Boosting | 0.466 | 2.16 | 1.57 |
 | 3 | Random Forest | 0.446 | 2.19 | 1.60 |
 | 4 | KNN (k=10) | 0.440 | 2.24 | 1.61 |
 | 5 | Ridge / Linear | 0.419 | 2.24 | 1.64 |
-| 6 | Decision Tree | −0.16 | 3.08 | 2.14 |
+| 6 | Decision Tree | -0.16 | 3.08 | 2.14 |
 
-**Best: SVR (RBF) — ~+25% R² over the linear baseline.** Non-linear models (SVR, gradient boosting) capture relationships the linear model misses; predicting exact age stays hard (~2-year error), so framing it as **age bands (classification)** is a sensible next step.
+The best performer is SVR with an RBF kernel, which is about 25% better in R squared than the linear baseline. The non-linear models (SVR, gradient boosting) capture relationships the linear model misses. Even so, predicting exact age stays hard with an error around 2 years, so reframing the problem as age bands (a classification task) is a sensible next step.
 
-## 📌 Roadmap
-- Handle **outliers** (e.g. `Height = 0`) and engineer features.
-- Try the **age-band classification** framing and tune the SVR/boosting hyper-parameters.
+## Roadmap
 
-📄 Reports: [`model_comparison_report.md`](model_comparison_report.md) · [`abalone_analysis_report.md`](abalone_analysis_report.md) (also PDF).
+- Handle outliers (for example rows where `Height = 0`) and try some feature engineering.
+- Explore the age-band classification framing and tune the SVR and gradient boosting hyper-parameters.
 
-## 🗂️ Structure
+Reports: [`model_comparison_report.md`](model_comparison_report.md) and [`abalone_analysis_report.md`](abalone_analysis_report.md) (also available as PDF).
+
+## Project structure
+
 ```
 .
 ├── initial_exploration.py        # EDA: load + descriptive stats
@@ -62,7 +65,8 @@ Beyond the linear baseline, several regressors were compared with **5-fold cross
 └── .gitignore
 ```
 
-## ▶️ How to run
+## How to run
+
 ```bash
 # 1) environment
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
@@ -74,8 +78,10 @@ python data_visualization.py        # generates the .png files
 python train_and_evaluate_model.py  # prints and saves R²/RMSE
 ```
 
-## 🛠️ Stack
-Python · pandas · scikit-learn · numpy · matplotlib · seaborn
+## Stack
 
-## 📜 Credit
+Python, pandas, scikit-learn, numpy, matplotlib, seaborn.
+
+## Credit
+
 Dataset: UCI ML Repository (Nash et al., 1994).
